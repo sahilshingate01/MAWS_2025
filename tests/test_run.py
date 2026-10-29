@@ -13,6 +13,17 @@ import pytest
 from maws.run import MawsResult, MawsRunner
 
 
+@pytest.mark.parametrize("beta", [0, -0.01, float("nan"), float("inf")])
+def test_runner_rejects_invalid_beta(beta: float) -> None:
+    with pytest.raises(ValueError, match="beta must be a finite value greater than 0"):
+        MawsRunner(
+            num_nucleotides=1,
+            aptamer_type="RNA",
+            molecule_type="protein",
+            beta=beta,
+        )
+
+
 @pytest.mark.integration
 def test_maws_runner_smoke(tmp_path: Path) -> None:
     pdb = Path("data/1BRQ.pdb")

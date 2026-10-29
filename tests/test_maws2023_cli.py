@@ -39,3 +39,10 @@ def test_cli_rejects_negative_salt_conc(monkeypatch) -> None:
     monkeypatch.setattr(sys, "argv", ["maws", "--salt-conc", "-0.1"])
     with pytest.raises(SystemExit):
         parse_args()
+
+
+@pytest.mark.parametrize("beta", ["0", "-0.01", "nan", "inf"])
+def test_cli_rejects_invalid_beta(monkeypatch, beta: str) -> None:
+    monkeypatch.setattr(sys, "argv", ["maws", "--beta", beta])
+    with pytest.raises(SystemExit):
+        parse_args()

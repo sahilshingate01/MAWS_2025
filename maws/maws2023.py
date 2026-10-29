@@ -35,6 +35,16 @@ def _non_negative_float(s: str) -> float:
     return v
 
 
+def _positive_float(s: str) -> float:
+    """argparse `type=` validator for finite positive floats."""
+    v = float(s)
+    if not np.isfinite(v) or v <= 0:
+        raise argparse.ArgumentTypeError(
+            f"must be a finite value greater than 0, got {v}"
+        )
+    return v
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="MAWS - Making Aptamers With Software")
     parser.add_argument(
@@ -71,7 +81,7 @@ def parse_args():
         help="Type of ligand molecule.",
     )
     parser.add_argument(
-        "-b", "--beta", type=float, default=0.01, help="Inverse temperature."
+        "-b", "--beta", type=_positive_float, default=0.01, help="Inverse temperature."
     )
     parser.add_argument(
         "-c1",

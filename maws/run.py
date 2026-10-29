@@ -75,6 +75,8 @@ class MawsRunner:
         salt_conc: float = 0.15,
         seed: int | None = None,
     ) -> None:
+        if not np.isfinite(beta) or beta <= 0:
+            raise ValueError(f"beta must be a finite value greater than 0, got {beta}")
         if num_nucleotides <= 0:
             raise ValueError(
                 f"num_nucleotides must be greater than 0, got {num_nucleotides}"
