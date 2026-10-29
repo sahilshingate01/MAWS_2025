@@ -90,6 +90,15 @@ class TestEntropyScore:
             entropy_score(energies, beta=0.01)
         )
 
+    @pytest.mark.parametrize(
+        "beta", [0, -0.01, float("nan"), float("inf"), -float("inf")]
+    )
+    def test_rejects_non_positive_or_non_finite_beta(self, beta):
+        with pytest.raises(
+            ValueError, match="beta must be a finite value greater than 0"
+        ):
+            entropy_score([1.0, 2.0, 3.0], beta=beta)
+
 
 class TestInternalFunctions:
     """Tests for internal helper functions."""

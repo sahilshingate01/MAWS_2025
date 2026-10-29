@@ -92,6 +92,8 @@ def entropy_score(sample, beta=0.01):
     energies = np.asarray(sample, dtype=float)
     if energies.size == 0:
         raise ValueError("sample must contain at least one energy value")
+    if not np.isfinite(beta) or beta <= 0:
+        raise ValueError(f"beta must be a finite value greater than 0, got {beta}")
 
     probabilities, _ = _boltzmann(energies, beta)
     uniform = np.full(probabilities.size, 1.0 / probabilities.size)
