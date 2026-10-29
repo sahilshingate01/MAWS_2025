@@ -13,6 +13,26 @@ import pytest
 from maws.run import MawsResult, MawsRunner
 
 
+@pytest.mark.parametrize("aptamer_type", ["rna", "DNAx", ""])
+def test_runner_rejects_unknown_aptamer_type(aptamer_type: str) -> None:
+    with pytest.raises(ValueError, match="aptamer_type must be 'RNA' or 'DNA'"):
+        MawsRunner(
+            num_nucleotides=1,
+            aptamer_type=aptamer_type,
+            molecule_type="protein",
+        )
+
+
+@pytest.mark.parametrize("molecule_type", ["ligand", "Protein", ""])
+def test_runner_rejects_unknown_molecule_type(molecule_type: str) -> None:
+    with pytest.raises(ValueError, match="molecule_type must be"):
+        MawsRunner(
+            num_nucleotides=1,
+            aptamer_type="RNA",
+            molecule_type=molecule_type,
+        )
+
+
 @pytest.mark.integration
 def test_maws_runner_smoke(tmp_path: Path) -> None:
     pdb = Path("data/1BRQ.pdb")

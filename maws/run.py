@@ -75,6 +75,15 @@ class MawsRunner:
         salt_conc: float = 0.15,
         seed: int | None = None,
     ) -> None:
+        if aptamer_type not in ("RNA", "DNA"):
+            raise ValueError(
+                f"aptamer_type must be 'RNA' or 'DNA', got {aptamer_type!r}"
+            )
+        if molecule_type not in ("protein", "organic", "lipid"):
+            raise ValueError(
+                "molecule_type must be 'protein', 'organic', or 'lipid', "
+                f"got {molecule_type!r}"
+            )
         if num_nucleotides <= 0:
             raise ValueError(
                 f"num_nucleotides must be greater than 0, got {num_nucleotides}"
