@@ -191,6 +191,12 @@ class Sphere:
     _rng: np.random.Generator = field(init=False, repr=False, compare=False)
 
     def __post_init__(self, rng):
+        centre = np.asarray(self.centre, dtype=float)
+        if not np.isfinite(self.radius) or self.radius < 0:
+            raise ValueError(f"radius must be finite and >= 0, got {self.radius}")
+        if centre.shape != (3,) or not np.isfinite(centre).all():
+            raise ValueError("centre must be a finite point of three coordinates")
+        object.__setattr__(self, "centre", centre)
         object.__setattr__(self, "_rng", np.random.default_rng(rng))
 
     def generator(self) -> Sample:
@@ -317,6 +323,8 @@ class Excluder:
     """
 
     def __init__(self, complex_obj, probe: float = 1.4):
+        if not np.isfinite(probe) or probe < 0:
+            raise ValueError(f"probe must be >= 0 and finite, got {probe}")
         positions = np.asarray(nostrom(complex_obj.positions), dtype=float)
         radii = _vdw_radii(complex_obj.topology)
         self._positions = positions
@@ -395,8 +403,8 @@ class ClashFilter:
     """
 
     def __init__(self, complex_obj, element, *, tolerance: float = 1.0):
-        if tolerance < 0:
-            raise ValueError(f"tolerance must be >= 0, got {tolerance}")
+        if not np.isfinite(tolerance) or tolerance < 0:
+            raise ValueError(f"tolerance must be finite and >= 0, got {tolerance}")
 
         radii = _vdw_radii(complex_obj.topology)
         positions = np.asarray(nostrom(complex_obj.positions), dtype=float)
@@ -678,8 +686,8 @@ class SurfaceFollowingSampler:
         radius: float | None = None,
         rng: int | np.random.Generator | None = None,
     ):
-        if d_max <= 0:
-            raise ValueError(f"d_max must be > 0, got {d_max}")
+        if not np.isfinite(d_max) or d_max <= 0:
+            raise ValueError(f"d_max must be > 0 and finite, got {d_max}")
         self._rng = np.random.default_rng(rng)
         positions = np.asarray(nostrom(complex_obj.positions), dtype=float)
 
@@ -816,22 +824,22 @@ def make_sampler(
     ...     ligand_only, mode="surface-following", d_max=4.0
     ... )
     """
-    if probe < 0:
-        raise ValueError(f"probe must be >= 0, got {probe}")
-    if reach < 0:
-        raise ValueError(f"reach must be >= 0, got {reach}")
+    if not np.isfinite(probe) or probe < 0:
+        raise ValueError(f"probe must be >= 0 and finite, got {probe}")
+    if not np.isfinite(reach) or reach < 0:
+        raise ValueError(f"reach must be >= 0 and finite, got {reach}")
     if site_centre is None and site_radius is not None:
         raise ValueError("site_radius applies only alongside site_centre.")
     if site_centre is not None:
         site_centre = np.asarray(site_centre, dtype=float)
-        if site_centre.shape != (3,):
+        if site_centre.shape != (3,) or not np.isfinite(site_centre).all():
             raise ValueError(
-                f"site_centre must be a point of three coordinates, got shape "
-                f"{site_centre.shape}"
+                "site_centre must be a finite point of three coordinates, "
+                f"got {site_centre}"
             )
         site_radius = 15.0 if site_radius is None else float(site_radius)
-        if site_radius <= 0:
-            raise ValueError(f"site_radius must be > 0, got {site_radius}")
+        if not np.isfinite(site_radius) or site_radius <= 0:
+            raise ValueError(f"site_radius must be > 0 and finite, got {site_radius}")
 
     if mode == "sphere":
         if site_centre is None:

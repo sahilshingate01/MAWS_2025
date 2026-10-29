@@ -597,6 +597,30 @@ class TestMakeSamplerValidation:
         with pytest.raises(ValueError, match="probe must be >= 0"):
             make_sampler(synthetic_octahedron_complex, probe=-1.0)
 
+    @pytest.mark.parametrize(
+        ("kwargs", "message"),
+        [
+            ({"reach": float("nan")}, "finite"),
+            ({"probe": float("inf")}, "finite"),
+            ({"d_max": float("nan")}, "finite"),
+            (
+                {"site_centre": [0.0, float("nan"), 0.0]},
+                "site_centre must be a finite",
+            ),
+            (
+                {"site_centre": [0.0, 0.0, 0.0], "site_radius": float("inf")},
+                "finite",
+            ),
+        ],
+    )
+    def test_rejects_non_finite_sampler_parameters(
+        self, synthetic_octahedron_complex, kwargs, message
+    ):
+        from maws.space import make_sampler
+
+        with pytest.raises(ValueError, match=message):
+            make_sampler(synthetic_octahedron_complex, **kwargs)
+
 
 class TestSurfaceSampler:
     def test_all_samples_clear(self, synthetic_octahedron_complex):
@@ -711,6 +735,8 @@ class TestSurfaceFollowingSampler:
             SurfaceFollowingSampler(synthetic_octahedron_complex, d_max=0.0)
         with pytest.raises(ValueError, match="d_max must be > 0"):
             SurfaceFollowingSampler(synthetic_octahedron_complex, d_max=-1.0)
+        with pytest.raises(ValueError, match="finite"):
+            SurfaceFollowingSampler(synthetic_octahedron_complex, d_max=float("nan"))
 
 
 class TestMakeSamplerModes:
