@@ -132,6 +132,39 @@ class TestComplexMakeSystem:
         )
 
 
+class TestComplexPlatformSelection:
+    def test_requested_platform_failure_is_reported(self, monkeypatch):
+        import maws.complex as complex_module
+
+        simulation_calls = []
+
+        class UnavailablePlatform:
+            @staticmethod
+            def getDefaultPluginsDirectory():  # noqa: N802
+                return "plugins"
+
+            @staticmethod
+            def loadPluginsFromDirectory(_directory):  # noqa: N802
+                pass
+
+            @staticmethod
+            def getPlatformByName(name):  # noqa: N802
+                raise ValueError(f"No platform named {name}")
+
+        monkeypatch.setattr(complex_module.mm, "Platform", UnavailablePlatform)
+        monkeypatch.setattr(
+            complex_module.app,
+            "Simulation",
+            lambda *args: simulation_calls.append(args),
+        )
+        monkeypatch.setenv("MAWS_OPENMM_PLATFORM", "CUDAA")
+
+        with pytest.raises(RuntimeError, match="requested OpenMM platform 'CUDAA'"):
+            Complex()._create_simulation()
+
+        assert simulation_calls == []
+
+
 class TestComplexAddChain:
     """Tests for Complex.add_chain() method."""
 

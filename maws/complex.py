@@ -262,8 +262,11 @@ class Complex:
                 return app.Simulation(
                     self.topology, self.system, self.integrator, platform
                 )
-            except Exception:
-                pass  # Fall through to auto-detection
+            except Exception as e:
+                raise RuntimeError(
+                    f"Could not initialize requested OpenMM platform "
+                    f"{env_platform!r}: {e}"
+                ) from e
 
         # Try GPU platforms in order
         for name in ("CUDA", "OpenCL"):
