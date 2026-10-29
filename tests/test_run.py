@@ -33,6 +33,16 @@ def test_runner_rejects_unknown_molecule_type(molecule_type: str) -> None:
         )
 
 
+def test_runner_rejects_unknown_sampler_mode() -> None:
+    with pytest.raises(ValueError, match="sampler_mode must be"):
+        MawsRunner(
+            num_nucleotides=1,
+            aptamer_type="RNA",
+            molecule_type="protein",
+            sampler_mode="sphere-following",
+        )
+
+
 @pytest.mark.integration
 def test_maws_runner_smoke(tmp_path: Path) -> None:
     pdb = Path("data/1BRQ.pdb")

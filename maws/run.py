@@ -84,6 +84,11 @@ class MawsRunner:
                 "molecule_type must be 'protein', 'organic', or 'lipid', "
                 f"got {molecule_type!r}"
             )
+        if sampler_mode not in ("sphere", "surface-following"):
+            raise ValueError(
+                "sampler_mode must be 'sphere' or 'surface-following', "
+                f"got {sampler_mode!r}"
+            )
         if num_nucleotides <= 0:
             raise ValueError(
                 f"num_nucleotides must be greater than 0, got {num_nucleotides}"
